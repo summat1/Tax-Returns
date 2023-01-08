@@ -1,0 +1,79 @@
+---
+title: "Understanding the US Tax Landscape"
+author: "Shivesh Ummat summat@uw.edu, David Li laviddi@uw.edu, Ismail Ibrahim ishy206@uw.edu"
+date: "November 14, 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+```
+
+
+```{r source, include = FALSE}
+source("../source/aggregate_table.R")
+source("../source/chart1.R")
+source("../source/chart2.R")
+source("../source/chart3.R")
+source("../source/summary_info.R")
+source("../source/data_access.R")
+```
+
+Exploratory data analysis of IRS Tax Return Data from 2019 helps elucidate trends in income and tax distribution. This dataset contains `r prettyNum(tax_returns$numobservations,big.mark=",",scientific=FALSE)` rows of data, each with `r prettyNum(tax_returns$numfeatures,big.mark=",",scientific=FALSE)` features. Each row represents one tax bracket and one zip code across the US. For each row, features such as number of returns filed, tax paid, income earned are recorded. In total there are `r prettyNum(tax_returns$numzipcodes,big.mark=",",scientific=FALSE)` number of Zip Codes that data has been collected for across `r tax_returns$numstates` number of states (including Washington, D.C.). Throughout all the observations,  the sum of the number of single returns, joint returns, and head of household returns totals to be `r prettyNum(tax_returns$totalreturns,big.mark=",",scientific=FALSE)`. Furthermore, the total amount of taxes collected in the US in 2019 was \$`r prettyNum(tax_returns$totaltaxescollected,big.mark=",",scientific=FALSE)`. Interestingly, the zip code with the highest amount of tax collected in the entire US was `r tax_returns$maxtaxcollectedzipcode`, in Manhattan, `r tax_returns$maxtaxcollectedstate`, where \$`r prettyNum(tax_returns$maxtaxcollected,big.mark=",",scientific=FALSE)` was collected. 
+
+```{r table, echo = FALSE, warning = FALSE, message = FALSE}
+kable(aggregate_table,
+      caption = "Income and Tax Statistics for each Tax Bracket in the US",
+      col.names = c("Tax Bracket Status",
+                    "Total Number of Returns Filed (in millions)", 
+                    "Total Adjusted Gross Income (in billions of dollars)", 
+                    "Percentage of US Total Income", 
+                    "Total Tax Payments (in billions of dollars)",
+                    "Percentage of US Total Taxes",
+                    "Effective Tax Rate Percent"),
+      align = 'ccccccc')
+```
+
+This table shows statistics about the income and tax payments for each major tax bracket in the US. The tax brackets are organized in an increasing fashion. Total number of returns reflects how many individuals are in this tax bracket. The majority are filing with income under $25,000, highlighting the high number of low earners in the US. Next, we look at total adjusted gross income. This is a metric that the IRS uses to calculate taxes by making slight adjustments to the total gross income. Interestingly, the AGI from tax bracket 2 is more than 3 and 4, suggesting that the middle class is shrinking. Unsurpsiringly, high earners in tax bracket 5 make up `r paste0(high_earners_percent_income, '%')` of the total income in the US, while the lowest earners in bracket 1 (which make up almost 6x more returns) only account for `r paste0(low_earners_percent_income, '%')` of income. Another statistic we can look at is tax payments. High earners (bracket 5) are paying upwards of `r paste0(high_earners_percent_tax, '%')` of total US taxes, almost 1 trillion US dollars. While the lowest earners only comprise `r paste0(low_earners_percent_tax, '%')` of total tax payments, they are still burdened with a `r paste0(low_earners_tax_rate, '%')` effective tax rate. This is calculated by dividing tax payment amount by AGI. The tax burden should be more emphasized on the higher earners, the percent should increase linearly as we move up brackets.
+
+```{r chart1, echo = FALSE, warning = FALSE}
+scatter_plot
+```
+
+This scatter plot was included to analyze the relationship between two 
+continuous variable: average total taxes owed per person and average adjusted 
+gross income per person. It shows how the average amount taxes owed per person
+varies with the average adjusted gross income per person across the United
+States, by tax bracket. In general, the average amount of taxes owed person 
+increases as the average adjusted gross income per person increases, which is 
+expected. However, when considering the relationship between these two values 
+between tax brackets, it is interesting to see how higher tax brackets owe a
+disproportionate amount of taxes. This is because we expect the average amount
+of total taxes owed to increase faster with average adjusted gross income for 
+higher brackets, compared to lower brackets, but this is not the case, as 
+shown in the scatter plot.
+
+```{r chart2, echo = FALSE, warning = FALSE}
+plot(boxplots)
+```
+
+These box plots were included to explore the wages of individuals across tax
+brackets. They show the distributions of the average salary per person for each
+tax bracket. It is interesting to observe the number of average salaries that
+lie outside of the upper and lower bounds of each tax bracket. This indicates
+that there are a number of factors outside of a person's salary that eventually
+determine which tax bracket they belong to. Also, the highest tax bracket has a
+visually larger interquartile range than all other tax brackets, as indicated by
+the width of the box. So, for the highest tax bracket, there is more variability 
+in the middle 50% of average salaries per person compared to that of other 
+brackets. In simple terms, this means that the middle half of the dollar amounts 
+for average salary per person take on more values for the highest tax bracket 
+compared to that of other tax brackets.
+
+```{r chart3, echo = FALSE, warning = FALSE}
+plot(bar_chart_income_not_from_wages)
+```
+
+This chart shows the income that individuals accrue not from salaries or wages. It was calculated from subtracting income from salaries and wages from total income. This income represents mostly capital gains as well as passive income from cash-generating businesses. The most important aspect of this is that salaries are taxed more than capital gains. Capital gains tax maxes at 20%, while salary tax maxes at 37%. The chart shows that the top bracket earns an extreme amount more from capital gains, an average of \$`r prettyNum(round(top_bracket_capital_gains, 0),big.mark=",",scientific=FALSE)` per person. Therefore, high earners are using the capital gains tax laws to pay less tax on their income. This law is much more exploitable for high earners who have the capital to fund portfolio investments. This is one of the most significant ways that wealthy individuals continue to become wealthier. This is an extremely relevant topic right now, as Joe Biden has proposed to raise the maximum capital gains tax from 20% to 39.6%. Therefore, for the highest bracket, capital gains will be effectively taxed as ordinary income. This will decrease the efficacy of this tax evasion strategy and promote equal paying of taxes.
