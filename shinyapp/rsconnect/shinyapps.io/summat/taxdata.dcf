@@ -1,0 +1,13 @@
+name: taxdata
+title: taxdata
+username:
+account: summat
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7840752
+bundleId: 6612019
+url: https://summat.shinyapps.io/taxdata/
+when: 1670529618.05731
+lastSyncTime: 1670529618.05731
+asMultiple: FALSE
+asStatic: FALSE
